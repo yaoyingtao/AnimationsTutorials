@@ -23,10 +23,10 @@
 import UIKit
 
 // A delay function
-func delay(seconds seconds: Double, completion:()->()) {
-  let popTime = dispatch_time(DISPATCH_TIME_NOW, Int64( Double(NSEC_PER_SEC) * seconds ))
+func delay(seconds: Double, completion:@escaping ()->()) {
+  let popTime = DispatchTime.now() + Double(Int64( Double(NSEC_PER_SEC) * seconds )) / Double(NSEC_PER_SEC)
   
-  dispatch_after(popTime, dispatch_get_main_queue()) {
+  DispatchQueue.main.asyncAfter(deadline: popTime) {
     completion()
   }
 }
@@ -47,7 +47,7 @@ class ViewController: UIViewController {
   
   // MARK: further UI
   
-  let spinner = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
+  let spinner = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
   let status = UIImageView(image: UIImage(named: "banner"))
   let label = UILabel()
   let messages = ["Connecting ...", "Authorization ...", "Sending credentials ...", "Failed"]
@@ -66,18 +66,18 @@ class ViewController: UIViewController {
     spinner.alpha = 0.0
     loginButton.addSubview(spinner)
     
-    status.hidden = true
+    status.isHidden = true
     status.center = loginButton.center
     view.addSubview(status)
     
     label.frame = CGRect(x: 0.0, y: 0.0, width: status.frame.size.width, height: status.frame.size.height)
     label.font = UIFont(name: "HelveticaNeue", size: 18.0)
     label.textColor = UIColor(red: 0.89, green: 0.38, blue: 0.0, alpha: 1.0)
-    label.textAlignment = .Center
+    label.textAlignment = .center
     status.addSubview(label)
   }
   
-  override func viewWillAppear(animated: Bool) {
+  override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
     heading.center.x  -= view.bounds.width
@@ -88,48 +88,67 @@ class ViewController: UIViewController {
     cloud2.alpha = 0.0
     cloud3.alpha = 0.0
     cloud4.alpha = 0.0
+    
+    loginButton.center.y += 30;
+    loginButton.alpha = 0.0;
   }
   
-  override func viewDidAppear(animated: Bool) {
+  override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
-    UIView.animateWithDuration(0.5, animations: {
+    UIView.animate(withDuration: 0.5, animations: {
       self.heading.center.x += self.view.bounds.width
     })
 
-    UIView.animateWithDuration(0.5, delay: 0.3, options: [], animations: {
+    UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
       self.username.center.x += self.view.bounds.width
     }, completion: nil)
 
-    UIView.animateWithDuration(0.5, delay: 0.4, options: [], animations: {
+    UIView.animate(withDuration: 0.5, delay: 0.4, options: [], animations: {
       self.password.center.x += self.view.bounds.width
     }, completion: nil)
 
-    UIView.animateWithDuration(0.5, delay: 0.5, options: [], animations: {
+    UIView.animate(withDuration: 0.5, delay: 0.5, options: [], animations: {
       self.cloud1.alpha = 1.0
       }, completion: nil)
     
-    UIView.animateWithDuration(0.5, delay: 0.5, options: [], animations: {
+    UIView.animate(withDuration: 0.5, delay: 0.5, options: [], animations: {
       self.cloud1.alpha = 1.0
       }, completion: nil)
     
-    UIView.animateWithDuration(0.5, delay: 0.7, options: [], animations: {
+    UIView.animate(withDuration: 0.5, delay: 0.7, options: [], animations: {
       self.cloud2.alpha = 1.0
       }, completion: nil)
     
-    UIView.animateWithDuration(0.5, delay: 0.9, options: [], animations: {
+    UIView.animate(withDuration: 0.5, delay: 0.9, options: [], animations: {
       self.cloud3.alpha = 1.0
       }, completion: nil)
     
-    UIView.animateWithDuration(0.5, delay: 1.1, options: [], animations: {
+    UIView.animate(withDuration: 0.5, delay: 1.1, options: [], animations: {
       self.cloud4.alpha = 1.0
       }, completion: nil)
+    
+    UIView.animate(withDuration: 0.5, delay: 0.5, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.0, options: [], animations: {
+        self.loginButton.center.y -= 30;
+        self.loginButton.alpha = 1.0;
+    }, completion: nil);
   }
   
   // MARK: further methods
   
   @IBAction func login() {
+    UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.0, options: [], animations: {
+        self.loginButton.bounds.size.width += 80;
+    }, completion: nil);
     
+    UIView.animate(withDuration: 0.33, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.0, options: [], animations: {
+        self.loginButton.center.y += 60;
+        self.loginButton.backgroundColor =
+            UIColor(red: 0.85, green: 0.83, blue: 0.45, alpha: 1.0);
+        self.spinner.center = CGPoint(x: 40.0,
+                                      y: self.loginButton.frame.size.height/2)
+        self.spinner.alpha = 1.0;
+    }, completion: nil);
   }
   
 }
