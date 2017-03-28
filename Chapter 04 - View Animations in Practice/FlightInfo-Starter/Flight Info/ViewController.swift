@@ -92,6 +92,8 @@ class ViewController: UIViewController {
         moveLabel(label: departingFrom, text: data.departingFrom, offset: offsetDeparting)
         let offsetArriving = CGPoint( x: 0.0, y: CGFloat(direction.rawValue * 50))
         moveLabel(label: arrivingTo, text: data.arrivingTo, offset: offsetArriving)
+        
+        cubeTransition(label: flightStatus, text: data.flightStatus, direction: direction);
 
     } else {
         bgImageView.image = UIImage(named: data.weatherImageName)
@@ -100,13 +102,14 @@ class ViewController: UIViewController {
         gateNr.text = data.gateNr
         departingFrom.text = data.departingFrom
         arrivingTo.text = data.arrivingTo
+        flightStatus.text = data.flightStatus
+
     }
     
     // populate the UI with the next flight's data
     summary.text = data.summary
 
 
-    flightStatus.text = data.flightStatus
 
     
     // schedule next flight
