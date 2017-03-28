@@ -78,6 +78,12 @@ class ViewController: UIViewController {
     label.textColor = UIColor(red: 0.89, green: 0.38, blue: 0.0, alpha: 1.0)
     label.textAlignment = .center
     status.addSubview(label)
+    
+    self.animateCloud(cloud: cloud1);
+    self.animateCloud(cloud: cloud2);
+    self.animateCloud(cloud: cloud3);
+    self.animateCloud(cloud: cloud4);
+
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -170,13 +176,15 @@ class ViewController: UIViewController {
             delay(seconds: 2, completion: { 
                 if index < self.messages.count - 1 {
                     self.removeMessage(index: index);
+                } else {
+                    self.resetForm();
                 }
             })
         };
     }
     
     func removeMessage(index:Int) {
-        UIView.animate(withDuration: 0.33, delay: 0, options: [], animations: { 
+        UIView.animate(withDuration: 0.33, delay: 0, options: [], animations: {
             self.status.center.x += self.view.bounds.width;
         }) {_ in
             self.status.center = self.statusPostion;
@@ -185,6 +193,34 @@ class ViewController: UIViewController {
             self.showMessage(index: index + 1);
         }
     }
+    
+    func resetForm() {
+        UIView.transition(with: status, duration: 0.2, options: [.transitionCurlUp], animations: {
+            self.status.isHidden = true;
+            self.status.center = self.statusPostion;
+        }, completion: nil);
+        
+        UIView.animate(withDuration: 0.2, delay: 0.2, options: [], animations: { 
+            self.spinner.isHidden = true;
+            self.loginButton.backgroundColor = UIColor(red: 0.63, green: 0.84, blue: 0.35, alpha: 1.0);
+            self.loginButton.bounds.size.width -= 80;
+            self.loginButton.center.y -= 60;
+        }, completion: nil);
+    }
   
+    func animateCloud(cloud:UIView) {
+        let speed = 60/view.bounds.width;
+        let time = (view.bounds.width - cloud.frame.origin.x) * speed;
+        
+        
+        UIView.animate(withDuration: TimeInterval(time), delay: 0, options: [.curveLinear], animations: {
+            cloud.center.x = self.view.bounds.width + cloud.bounds.width/2;
+        }) { _ in
+            cloud.center.x = -cloud.bounds.width/2;
+            self.animateCloud(cloud: cloud);
+        }
+        
+        
+    }
 }
 
