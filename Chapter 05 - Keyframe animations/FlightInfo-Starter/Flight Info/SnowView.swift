@@ -34,10 +34,10 @@ class SnowView: UIView {
     emitter.emitterShape = kCAEmitterLayerRectangle
     
     let emitterCell = CAEmitterCell()
-    emitterCell.contents = UIImage(named: "flake.png")!.CGImage
+    emitterCell.contents = UIImage(named: "flake.png")!.cgImage
     emitterCell.birthRate = 200
     emitterCell.lifetime = 3.5
-    emitterCell.color = UIColor.whiteColor().CGColor
+    emitterCell.color = UIColor.white.cgColor
     emitterCell.redRange = 0.0
     emitterCell.blueRange = 0.1
     emitterCell.greenRange = 0.0
@@ -60,7 +60,7 @@ class SnowView: UIView {
     fatalError("init(coder:) has not been implemented")
   }
   
-  override class func layerClass() -> AnyClass {
+  override class var layerClass : AnyClass {
     return CAEmitterLayer.self
   }
   
