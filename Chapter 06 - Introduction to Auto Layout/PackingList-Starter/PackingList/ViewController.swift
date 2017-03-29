@@ -38,11 +38,11 @@ class ViewController: UIViewController {
   
   //MARK: class methods
   
-  @IBAction func actionToggleMenu(sender: AnyObject) {
+  @IBAction func actionToggleMenu(_ sender: AnyObject) {
     
   }
   
-  func showItem(index: Int) {
+  func showItem(_ index: Int) {
     print("tapped item \(index)")
     
   }
@@ -63,24 +63,24 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
   
   // MARK: Table View methods
   
-  func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+  func numberOfSections(in tableView: UITableView) -> Int {
     return 1
   }
   
-  func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return items.count
   }
   
-  func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as UITableViewCell
-    cell.accessoryType = .None
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as UITableViewCell
+    cell.accessoryType = .none
     cell.textLabel?.text = itemTitles[items[indexPath.row]]
     cell.imageView?.image = UIImage(named: "summericons_100px_0\(items[indexPath.row]).png")
     return cell
   }
   
-  func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-    tableView.deselectRowAtIndexPath(indexPath, animated: true)
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    tableView.deselectRow(at: indexPath, animated: true)
     showItem(items[indexPath.row])
   }
   
