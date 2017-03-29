@@ -28,7 +28,7 @@ import UIKit
 //
 class HorizontalItemList: UIScrollView {
   
-  var didSelectItem: ((index: Int)->())?
+  var didSelectItem: ((_ index: Int)->())?
   
   let buttonWidth: CGFloat = 60.0
   let padding: CGFloat = 10.0
@@ -47,12 +47,12 @@ class HorizontalItemList: UIScrollView {
     
     self.alpha = 0.0
     
-    for var i = 0; i < 10; i++ {
+    for i in 0 ..< 10 {
       let image = UIImage(named: "summericons_100px_0\(i).png")
       let imageView  = UIImageView(image: image)
       imageView.center = CGPoint(x: CGFloat(i) * buttonWidth + buttonWidth/2, y: buttonWidth/2)
       imageView.tag = i
-      imageView.userInteractionEnabled = true
+      imageView.isUserInteractionEnabled = true
       addSubview(imageView)
       
       let tap = UITapGestureRecognizer(target: self, action: Selector("didTapImage:"))
@@ -62,8 +62,8 @@ class HorizontalItemList: UIScrollView {
     contentSize = CGSize(width: padding * buttonWidth, height:  buttonWidth + 2*padding)
   }
   
-  func didTapImage(tap: UITapGestureRecognizer) {
-    didSelectItem?(index: tap.view!.tag)
+  func didTapImage(_ tap: UITapGestureRecognizer) {
+    didSelectItem?(tap.view!.tag)
   }
   
   override func didMoveToSuperview() {
@@ -73,7 +73,7 @@ class HorizontalItemList: UIScrollView {
       return
     }
     
-    UIView.animateWithDuration(1.0, delay: 0.01, usingSpringWithDamping: 0.5, initialSpringVelocity: 10.0, options: .CurveEaseIn, animations: {
+    UIView.animate(withDuration: 1.0, delay: 0.01, usingSpringWithDamping: 0.5, initialSpringVelocity: 10.0, options: .curveEaseIn, animations: {
       self.alpha = 1.0
       self.center.x -= self.frame.size.width
       }, completion: nil)
