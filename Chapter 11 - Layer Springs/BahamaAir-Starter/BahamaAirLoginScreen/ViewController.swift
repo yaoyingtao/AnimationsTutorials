@@ -276,20 +276,23 @@ class ViewController: UIViewController,CAAnimationDelegate {
   
   func tintBackgroundColor(layer: CALayer, toColor: UIColor) {
     
-    let tint = CABasicAnimation(keyPath: "backgroundColor")
+    let tint = CASpringAnimation(keyPath: "backgroundColor")
     tint.fromValue = layer.backgroundColor
     tint.toValue = toColor.cgColor
     tint.duration = 1.0
+    tint.damping = 3.0
+    tint.initialVelocity = -10;
     layer.add(tint, forKey: nil)
     layer.backgroundColor = toColor.cgColor
   }
   
   func roundCorners(layer: CALayer, toRadius: CGFloat) {
     
-    let round = CABasicAnimation(keyPath: "cornerRadius")
+    let round = CASpringAnimation(keyPath: "cornerRadius")
     round.fromValue = layer.cornerRadius
     round.toValue = toRadius
     round.duration = 0.33
+    round.damping = 5.0
     layer.add(round, forKey: nil)
     layer.cornerRadius = toRadius
   }
