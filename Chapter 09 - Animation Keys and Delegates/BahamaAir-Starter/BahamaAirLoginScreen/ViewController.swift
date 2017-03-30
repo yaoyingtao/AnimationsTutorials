@@ -23,15 +23,15 @@
 import UIKit
 
 // A delay function
-func delay(seconds seconds: Double, completion:()->()) {
-  let popTime = dispatch_time(DISPATCH_TIME_NOW, Int64( Double(NSEC_PER_SEC) * seconds ))
+func delay(seconds: Double, completion:@escaping ()->()) {
+  let popTime = DispatchTime.now() + Double(Int64( Double(NSEC_PER_SEC) * seconds )) / Double(NSEC_PER_SEC)
   
-  dispatch_after(popTime, dispatch_get_main_queue()) {
+  DispatchQueue.main.asyncAfter(deadline: popTime) {
     completion()
   }
 }
 
-class ViewController: UIViewController {
+class ViewController: UIViewController,CAAnimationDelegate {
   
   // MARK: IB outlets
   
@@ -47,10 +47,12 @@ class ViewController: UIViewController {
   
   // MARK: further UI
   
-  let spinner = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
+  let spinner = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
   let status = UIImageView(image: UIImage(named: "banner"))
   let label = UILabel()
   let messages = ["Connecting ...", "Authorizing ...", "Sending credentials ...", "Failed"]
+    
+    let info = UILabel()
   
   var statusPosition = CGPoint.zero
   
@@ -68,20 +70,42 @@ class ViewController: UIViewController {
     spinner.alpha = 0.0
     loginButton.addSubview(spinner)
     
-    status.hidden = true
+    status.isHidden = true
     status.center = loginButton.center
     view.addSubview(status)
     
     label.frame = CGRect(x: 0.0, y: 0.0, width: status.frame.size.width, height: status.frame.size.height)
     label.font = UIFont(name: "HelveticaNeue", size: 18.0)
     label.textColor = UIColor(red: 0.89, green: 0.38, blue: 0.0, alpha: 1.0)
-    label.textAlignment = .Center
+    label.textAlignment = .center
     status.addSubview(label)
     
     statusPosition = status.center
+    
+    username.delegate = self;
+    
+    info.frame = CGRect(x: 0, y: loginButton.center.y + 60, width: view.bounds.width, height: 30);
+    info.font = UIFont(name: "HelveticaNeue", size: 12.0);
+    info.backgroundColor = UIColor.clear;
+    info.textAlignment = .center;
+    info.textColor = UIColor.white;
+    info.text = "Tap on a field and enter username and password";
+    view.insertSubview(info, belowSubview: loginButton);
+    
+    let rightAni = CABasicAnimation(keyPath: "position.x")
+    rightAni.fromValue = info.center.x + view.bounds.width;
+    rightAni.toValue = info.center.x;
+    rightAni.duration = 5.0;
+    info.layer.add(rightAni, forKey: "infoappear");
+    
+    let fadeAni = CABasicAnimation(keyPath: "opacity");
+    fadeAni.fromValue = 0.2;
+    fadeAni.toValue = 1.0;
+    fadeAni.duration = 4.5;
+    info.layer.add(fadeAni, forKey: "fadein");
   }
   
-  override func viewWillAppear(animated: Bool) {
+  override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
     loginButton.center.y += 30.0
@@ -92,7 +116,7 @@ class ViewController: UIViewController {
 
   }
   
-  override func viewDidAppear(animated: Bool) {
+  override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
 
     let flyRight = CABasicAnimation(keyPath: "position.x")
@@ -100,14 +124,19 @@ class ViewController: UIViewController {
     flyRight.toValue = view.bounds.size.width/2
     flyRight.duration = 0.5
     flyRight.fillMode = kCAFillModeBoth
-    heading.layer.addAnimation(flyRight, forKey: nil)
+    flyRight.delegate = self;
+    flyRight.setValue("form", forKey: "name");
+    flyRight.setValue(heading.layer, forKey: "layer")
+    heading.layer.add(flyRight, forKey: nil)
 
     flyRight.beginTime = CACurrentMediaTime() + 0.3
-    username.layer.addAnimation(flyRight, forKey: nil)
+    flyRight.setValue(username.layer, forKey: "layer")
+    username.layer.add(flyRight, forKey: nil)
     username.layer.position.x = view.bounds.size.width/2
     
     flyRight.beginTime = CACurrentMediaTime() + 0.4
-    password.layer.addAnimation(flyRight, forKey: nil)
+    flyRight.setValue(password.layer, forKey: "layer")
+    password.layer.add(flyRight, forKey: nil)
     password.layer.position.x = view.bounds.size.width/2
     
     let fadeIn = CABasicAnimation(keyPath: "opacity")
@@ -116,37 +145,42 @@ class ViewController: UIViewController {
     fadeIn.duration = 0.5
     fadeIn.fillMode = kCAFillModeBackwards
     fadeIn.beginTime = CACurrentMediaTime() + 0.5
-    cloud1.layer.addAnimation(fadeIn, forKey: nil)
+    cloud1.layer.add(fadeIn, forKey: nil)
     
     fadeIn.beginTime = CACurrentMediaTime() + 0.7
-    cloud2.layer.addAnimation(fadeIn, forKey: nil)
+    cloud2.layer.add(fadeIn, forKey: nil)
     
     fadeIn.beginTime = CACurrentMediaTime() + 0.9
-    cloud3.layer.addAnimation(fadeIn, forKey: nil)
+    cloud3.layer.add(fadeIn, forKey: nil)
     
     fadeIn.beginTime = CACurrentMediaTime() + 1.1
-    cloud4.layer.addAnimation(fadeIn, forKey: nil)
+    cloud4.layer.add(fadeIn, forKey: nil)
     
-    UIView.animateWithDuration(0.5, delay: 0.5, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.0, options: [], animations: {
+    UIView.animate(withDuration: 0.5, delay: 0.5, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.0, options: [], animations: {
         self.loginButton.center.y -= 30.0
         self.loginButton.alpha = 1.0
     }, completion: nil)
 
-    animateCloud(cloud1)
-    animateCloud(cloud2)
-    animateCloud(cloud3)
-    animateCloud(cloud4)
+//    animateCloud(cloud1)
+//    animateCloud(cloud2)
+//    animateCloud(cloud3)
+//    animateCloud(cloud4)
+    animationCloud(layer: cloud1.layer);
+    animationCloud(layer: cloud2.layer);
+    animationCloud(layer: cloud3.layer);
+    animationCloud(layer: cloud4.layer);
+
   }
   
   // MARK: further methods
   
   @IBAction func login() {
 
-    UIView.animateWithDuration(1.5, delay: 0.0, usingSpringWithDamping: 0.2, initialSpringVelocity: 0.0, options: [], animations: {
+    UIView.animate(withDuration: 1.5, delay: 0.0, usingSpringWithDamping: 0.2, initialSpringVelocity: 0.0, options: [], animations: {
       self.loginButton.bounds.size.width += 80.0
     }, completion: nil)
 
-    UIView.animateWithDuration(0.33, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
+    UIView.animate(withDuration: 0.33, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
       self.loginButton.center.y += 60.0
       
       
@@ -162,12 +196,12 @@ class ViewController: UIViewController {
     roundCorners(layer: loginButton.layer, toRadius: 25.0)
   }
 
-  func showMessage(index index: Int) {
+  func showMessage(index: Int) {
     label.text = messages[index]
     
-    UIView.transitionWithView(status, duration: 0.33, options:
-      [.CurveEaseOut, .TransitionFlipFromBottom], animations: {
-        self.status.hidden = false
+    UIView.transition(with: status, duration: 0.33, options:
+      [.curveEaseOut, .transitionFlipFromBottom], animations: {
+        self.status.isHidden = false
       }, completion: {_ in
         //transition completion
         delay(seconds: 2.0) {
@@ -181,11 +215,11 @@ class ViewController: UIViewController {
     })
   }
 
-  func removeMessage(index index: Int) {
-    UIView.animateWithDuration(0.33, delay: 0.0, options: [], animations: {
+  func removeMessage(index: Int) {
+    UIView.animate(withDuration: 0.33, delay: 0.0, options: [], animations: {
       self.status.center.x += self.view.frame.size.width
     }, completion: {_ in
-      self.status.hidden = true
+      self.status.isHidden = true
       self.status.center = self.statusPosition
       
       self.showMessage(index: index+1)
@@ -193,12 +227,12 @@ class ViewController: UIViewController {
   }
 
   func resetForm() {
-    UIView.transitionWithView(status, duration: 0.2, options: .TransitionFlipFromTop, animations: {
-      self.status.hidden = true
+    UIView.transition(with: status, duration: 0.2, options: .transitionFlipFromTop, animations: {
+      self.status.isHidden = true
       self.status.center = self.statusPosition
     }, completion: nil)
     
-    UIView.animateWithDuration(0.2, delay: 0.0, options: [], animations: {
+    UIView.animate(withDuration: 0.2, delay: 0.0, options: [], animations: {
       self.spinner.center = CGPoint(x: -20.0, y: 16.0)
       self.spinner.alpha = 0.0
       self.loginButton.bounds.size.width -= 80.0
@@ -210,10 +244,10 @@ class ViewController: UIViewController {
       })
   }
   
-  func animateCloud(cloud: UIImageView) {
+  func animateCloud(_ cloud: UIImageView) {
     let cloudSpeed = 60.0 / view.frame.size.width
     let duration = (view.frame.size.width - cloud.frame.origin.x) * cloudSpeed
-    UIView.animateWithDuration(NSTimeInterval(duration), delay: 0.0, options: .CurveLinear, animations: {
+    UIView.animate(withDuration: TimeInterval(duration), delay: 0.0, options: .curveLinear, animations: {
       cloud.frame.origin.x = self.view.frame.size.width
     }, completion: {_ in
       cloud.frame.origin.x = -cloud.frame.size.width
@@ -221,24 +255,67 @@ class ViewController: UIViewController {
     })
   }
   
-  func tintBackgroundColor(layer layer: CALayer, toColor: UIColor) {
+  func tintBackgroundColor(layer: CALayer, toColor: UIColor) {
     
     let tint = CABasicAnimation(keyPath: "backgroundColor")
     tint.fromValue = layer.backgroundColor
-    tint.toValue = toColor.CGColor
+    tint.toValue = toColor.cgColor
     tint.duration = 1.0
-    layer.addAnimation(tint, forKey: nil)
-    layer.backgroundColor = toColor.CGColor
+    layer.add(tint, forKey: nil)
+    layer.backgroundColor = toColor.cgColor
   }
   
-  func roundCorners(layer layer: CALayer, toRadius: CGFloat) {
+  func roundCorners(layer: CALayer, toRadius: CGFloat) {
     
     let round = CABasicAnimation(keyPath: "cornerRadius")
     round.fromValue = layer.cornerRadius
     round.toValue = toRadius
     round.duration = 0.33
-    layer.addAnimation(round, forKey: nil)
+    layer.add(round, forKey: nil)
     layer.cornerRadius = toRadius
   }
+    
+     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        print("ani finished");
+        if let name = anim.value(forKey: "name") as? String {
+            if name == "form" {
+                let layer = anim.value(forKey: "layer") as? CALayer;
+                anim.setValue(nil, forKey: "layer")
+                
+                let transAni = CABasicAnimation(keyPath: "transform.scale");
+                transAni.fromValue = 1.25
+                transAni.toValue = 1.0
+                transAni.duration = 0.25
+                layer?.add(transAni, forKey: "");
+            } else if name == "cloud" {
+                let layer = anim.value(forKey: "layer") as? CALayer;
+                anim.setValue(nil, forKey: "layer")
+                
+                layer?.position.x = CGFloat((layer?.bounds.width)!/2);
+                if let layerr = layer {
+                    self.animationCloud(layer: layerr);
+                }
+            }
+        }
+    }
+    
+    func animationCloud(layer:CALayer) {
+        let cloudSpeed = 60.0 / Double(view.layer.frame.size.width);
+        let duration: TimeInterval = Double(view.layer.frame.size.width - layer.frame.origin.x) * cloudSpeed;
+        
+        let ani = CABasicAnimation(keyPath: "position.x")
+        ani.duration = duration;
+        ani.toValue = self.view.bounds.width + layer.bounds.width/2;
+        ani.setValue(layer, forKey: "layer");
+        ani.setValue("cloud", forKey: "name");
+        ani.delegate = self;
+        layer.add(ani, forKey: "cloudAni")
+    }
+}
+
+extension ViewController:UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        info.layer.removeAnimation(forKey: "infoappear");
+    }
 }
 
