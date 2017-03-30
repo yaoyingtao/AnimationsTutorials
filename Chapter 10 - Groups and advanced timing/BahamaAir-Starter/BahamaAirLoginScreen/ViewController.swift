@@ -98,34 +98,66 @@ class ViewController: UIViewController,CAAnimationDelegate {
 //    loginButton.center.y += 30.0
 //    loginButton.alpha = 0.0
     
-    username.layer.position.x -= view.bounds.width
-    password.layer.position.x -= view.bounds.width
+//    username.layer.position.x -= view.bounds.width
+//    password.layer.position.x -= view.bounds.width
 
   }
   
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
 
+//    let flyRight = CABasicAnimation(keyPath: "position.x")
+//    flyRight.fromValue = -view.bounds.size.width/2
+//    flyRight.toValue = view.bounds.size.width/2
+//    flyRight.duration = 0.5
+//    flyRight.fillMode = kCAFillModeBoth
+//    flyRight.delegate = self
+//    flyRight.setValue("form", forKey: "name")
+//    flyRight.setValue(heading.layer, forKey: "layer")
+//
+//    heading.layer.add(flyRight, forKey: nil)
+//
+//    flyRight.beginTime = CACurrentMediaTime() + 0.3
+//    flyRight.setValue(username.layer, forKey: "layer")
+//    username.layer.add(flyRight, forKey: nil)
+//    username.layer.position.x = view.bounds.size.width/2
+//    
+//    flyRight.beginTime = CACurrentMediaTime() + 0.4
+//    flyRight.setValue(password.layer, forKey: "layer")
+//    password.layer.add(flyRight, forKey: nil)
+//    password.layer.position.x = view.bounds.size.width/2
+    
+    let formGroup = CAAnimationGroup();
+    formGroup.duration = 0.5;
+    formGroup.delegate = self;
+    formGroup.fillMode = kCAFillModeBackwards;
+    formGroup.setValue("form", forKey: "name")
+    
     let flyRight = CABasicAnimation(keyPath: "position.x")
     flyRight.fromValue = -view.bounds.size.width/2
     flyRight.toValue = view.bounds.size.width/2
-    flyRight.duration = 0.5
-    flyRight.fillMode = kCAFillModeBoth
-    flyRight.delegate = self
-    flyRight.setValue("form", forKey: "name")
-    flyRight.setValue(heading.layer, forKey: "layer")
-
-    heading.layer.add(flyRight, forKey: nil)
-
-    flyRight.beginTime = CACurrentMediaTime() + 0.3
-    flyRight.setValue(username.layer, forKey: "layer")
-    username.layer.add(flyRight, forKey: nil)
-    username.layer.position.x = view.bounds.size.width/2
     
-    flyRight.beginTime = CACurrentMediaTime() + 0.4
-    flyRight.setValue(password.layer, forKey: "layer")
-    password.layer.add(flyRight, forKey: nil)
-    password.layer.position.x = view.bounds.size.width/2
+    let fadeFieldIn = CABasicAnimation(keyPath: "opacity")
+    fadeFieldIn.fromValue = 0.25
+    fadeFieldIn.toValue = 1.0
+    
+    formGroup.animations = [flyRight, fadeFieldIn];
+    
+    formGroup.setValue(heading.layer, forKey: "layer");
+    formGroup.beginTime = CACurrentMediaTime() + 0.3;
+    heading.layer.add(formGroup, forKey: nil);
+    
+    formGroup.setValue(username.layer, forKey: "layer");
+    formGroup.beginTime = CACurrentMediaTime() + 0.4;
+    username.layer.add(formGroup, forKey: nil);
+    
+    
+    
+
+    
+    
+    
+    
     
     let fadeIn = CABasicAnimation(keyPath: "opacity")
     fadeIn.fromValue = 0.0
