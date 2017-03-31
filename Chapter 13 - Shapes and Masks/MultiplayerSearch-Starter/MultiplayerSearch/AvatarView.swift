@@ -58,6 +58,8 @@ class AvatarView: UIView {
   }
   
   var shouldTransitionToFinishedState = false
+    var isSquare = false
+
   
   override func didMoveToWindow() {
     layer.addSublayer(photoLayer)
@@ -95,15 +97,20 @@ class AvatarView: UIView {
         UIView.animate(withDuration: animationDuration, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.0, options: [.curveEaseIn], animations: {
             self.center = point;
         }) {_ in
-            
+            if self.shouldTransitionToFinishedState {
+                self.animateToSquare()
+            }
         };
         
         UIView.animate(withDuration: animationDuration, delay: animationDuration, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.0, options: [.curveEaseOut], animations: { 
             self.center = originCenter;
         }, completion: {_ in
-            delay(seconds: 0.1, completion: { 
-                self.bounceOffPoint(point: point, morphSize: morphSize);
-            })
+                delay(seconds: 0.1, completion: {
+                    if !self.isSquare {
+                        self.bounceOffPoint(point: point, morphSize: morphSize);
+
+                    }
+                })
         });
         
         let morphedFrame = (originCenter.x > point.x) ? CGRect(x: 0, y: bounds.height - morphSize.height, width: morphSize.width, height: morphSize.height):
@@ -118,6 +125,22 @@ class AvatarView: UIView {
                 name: kCAMediaTimingFunctionEaseOut)
         circleLayer.add(morphAnimation, forKey: nil);
         maskLayer.add(morphAnimation, forKey: nil);
+    }
+    
+    func animateToSquare() {
+        isSquare = true
+        
+        let squarePath = UIBezierPath(rect: bounds).cgPath
+        let morph = CABasicAnimation(keyPath: "path")
+        morph.duration = 0.25
+        morph.fromValue = circleLayer.path
+        morph.toValue = squarePath
+        
+        circleLayer.add(morph, forKey: nil);
+        maskLayer.add(morph, forKey: nil);
+        
+        circleLayer.path = squarePath
+        maskLayer.path = squarePath
     }
   
 }
