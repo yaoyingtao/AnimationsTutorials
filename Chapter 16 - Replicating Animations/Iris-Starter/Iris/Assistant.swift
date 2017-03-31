@@ -19,9 +19,9 @@ class Assistant: NSObject, AVSpeechSynthesizerDelegate {
         "Here is the list of the 20 closest 'raging football fans' around you"
     ]
     
-    private var completionBlock: ( () -> Void )?
+    fileprivate var completionBlock: ( () -> Void )?
     
-    private let synth = AVSpeechSynthesizer()
+    fileprivate let synth = AVSpeechSynthesizer()
     
     override init () {
         super.init()
@@ -32,18 +32,18 @@ class Assistant: NSObject, AVSpeechSynthesizerDelegate {
         return answers[Int(arc4random_uniform(UInt32(answers.count)))]
     }
     
-    func speak(phrase: String, completion: ()->Void) {
+    func speak(_ phrase: String, completion: @escaping ()->Void) {
         //save the completion block
         completionBlock = completion
 
         let utterance = AVSpeechUtterance(string: phrase)
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate
         utterance.volume = 1.0
-        synth.speakUtterance(utterance)
+        synth.speak(utterance)
     }
     
     //MARK: - speech synth methods
-    internal func speechSynthesizer(synthesizer: AVSpeechSynthesizer, didFinishSpeechUtterance utterance: AVSpeechUtterance) {
+    internal func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
         completionBlock?()
     }
 }

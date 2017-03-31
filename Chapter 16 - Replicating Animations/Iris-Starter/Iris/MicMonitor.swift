@@ -11,28 +11,28 @@ import AVFoundation
 
 class MicMonitor: NSObject {
     
-    private var recorder: AVAudioRecorder!
-    private var timer: NSTimer?
-    private var levelsHandler: ((Float)->Void)?
+    fileprivate var recorder: AVAudioRecorder!
+    fileprivate var timer: Timer?
+    fileprivate var levelsHandler: ((Float)->Void)?
     
     override init() {
         
-        let url = NSURL(fileURLWithPath: "/dev/null", isDirectory: true)
+        let url = URL(fileURLWithPath: "/dev/null", isDirectory: true)
         let settings: [String: AnyObject] = [
-            AVSampleRateKey: 44100.0,
-            AVNumberOfChannelsKey: 1,
-            AVFormatIDKey: NSNumber(unsignedInt: kAudioFormatAppleLossless),
-            AVEncoderAudioQualityKey: AVAudioQuality.Min.rawValue
+            AVSampleRateKey: 44100.0 as AnyObject,
+            AVNumberOfChannelsKey: 1 as AnyObject,
+            AVFormatIDKey: NSNumber(value: kAudioFormatAppleLossless as UInt32),
+            AVEncoderAudioQualityKey: AVAudioQuality.min.rawValue as AnyObject
         ]
         
         let audioSession = AVAudioSession.sharedInstance()
         
-        if audioSession.recordPermission() != .Granted {
+        if audioSession.recordPermission() != .granted {
             audioSession.requestRecordPermission({success in print("microphone permission: \(success)")})
         }
         
         do {
-            try recorder = AVAudioRecorder(URL: url, settings: settings)
+            try recorder = AVAudioRecorder(url: url, settings: settings)
             try audioSession.setCategory(AVAudioSessionCategoryPlayAndRecord)
         } catch {
             print("Couldn't initialize the mic input")
@@ -41,15 +41,15 @@ class MicMonitor: NSObject {
         if let recorder = recorder {
             //start observing mic levels
             recorder.prepareToRecord()
-            recorder.meteringEnabled = true
+            recorder.isMeteringEnabled = true
         }
     }
     
-    func startMonitoringWithHandler(handler: (Float)->Void) {
+    func startMonitoringWithHandler(_ handler: @escaping (Float)->Void) {
         levelsHandler = handler
         
         //start meters
-        timer = NSTimer.scheduledTimerWithTimeInterval(0.02, target: self, selector: "handleMicLevel:", userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 0.02, target: self, selector: "handleMicLevel:", userInfo: nil, repeats: true)
         recorder.record()
     }
     
@@ -59,9 +59,9 @@ class MicMonitor: NSObject {
         recorder.stop()
     }
     
-    func handleMicLevel(timer: NSTimer) {
+    func handleMicLevel(_ timer: Timer) {
         recorder.updateMeters()
-        levelsHandler?(recorder.averagePowerForChannel(0))
+        levelsHandler?(recorder.averagePower(forChannel: 0))
     }
     
     deinit {
