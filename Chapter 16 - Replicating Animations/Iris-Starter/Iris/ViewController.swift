@@ -95,8 +95,22 @@ class ViewController: UIViewController {
   @IBAction func actionEndMonitoring(_ sender: AnyObject) {
     
     monitor.stopMonitoring()
-    dot.removeAllAnimations()
+    let scale = CABasicAnimation(keyPath: "transform.scale.y")
+    scale.fromValue = lastTransformScale
+    scale.toValue = 1.0
+    scale.duration = 0.2
+    scale.isRemovedOnCompletion = false
+    scale.fillMode = kCAFillModeForwards
+    dot.add(scale, forKey: nil)
     
+    dot.backgroundColor = UIColor.magenta.cgColor
+    
+    let tint = CABasicAnimation(keyPath: "backgroundColor")
+    tint.fromValue = UIColor.green.cgColor
+    tint.toValue = UIColor.magenta.cgColor
+    tint.duration = 1.2
+    tint.fillMode = kCAFillModeBackwards
+    dot.add(tint, forKey: nil)
     //speak after 1 second
     delay(seconds: 1.0, completion: {
       self.startSpeaking()
