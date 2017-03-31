@@ -37,8 +37,8 @@ class AvatarView: UIView {
   let label: UILabel = {
     let label = UILabel()
     label.font = UIFont(name: "ArialRoundedMTBold", size: 18.0)
-    label.textAlignment = .Center
-    label.textColor = UIColor.blackColor()
+    label.textAlignment = .center
+    label.textColor = UIColor.black
     return label
     }()
   
@@ -46,7 +46,7 @@ class AvatarView: UIView {
   @IBInspectable
   var image: UIImage! {
     didSet {
-      photoLayer.contents = image.CGImage
+      photoLayer.contents = image.cgImage
     }
   }
   
@@ -61,6 +61,9 @@ class AvatarView: UIView {
   
   override func didMoveToWindow() {
     layer.addSublayer(photoLayer)
+    photoLayer.mask = maskLayer;
+    layer.addSublayer(circleLayer);
+    addSubview(label);
   }
   
   override func layoutSubviews() {
@@ -73,10 +76,10 @@ class AvatarView: UIView {
       height: image.size.height)
     
     //Draw the circle
-    circleLayer.path = UIBezierPath(ovalInRect: bounds).CGPath
-    circleLayer.strokeColor = UIColor.whiteColor().CGColor
+    circleLayer.path = UIBezierPath(ovalIn: bounds).cgPath
+    circleLayer.strokeColor = UIColor.white.cgColor
     circleLayer.lineWidth = lineWidth
-    circleLayer.fillColor = UIColor.clearColor().CGColor
+    circleLayer.fillColor = UIColor.clear.cgColor
     
     //Size the layer
     maskLayer.path = circleLayer.path
@@ -85,5 +88,36 @@ class AvatarView: UIView {
     //Size the label
     label.frame = CGRect(x: 0.0, y: bounds.size.height + 10.0, width: bounds.size.width, height: 24.0)
   }
+    
+    func bounceOffPoint(point:CGPoint, morphSize:CGSize) {
+        let originCenter = center;
+        
+        UIView.animate(withDuration: animationDuration, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.0, options: [.curveEaseIn], animations: {
+            self.center = point;
+        }) {_ in
+            
+        };
+        
+        UIView.animate(withDuration: animationDuration, delay: animationDuration, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.0, options: [.curveEaseOut], animations: { 
+            self.center = originCenter;
+        }, completion: {_ in
+            delay(seconds: 0.1, completion: { 
+                self.bounceOffPoint(point: point, morphSize: morphSize);
+            })
+        });
+        
+        let morphedFrame = (originCenter.x > point.x) ? CGRect(x: 0, y: bounds.height - morphSize.height, width: morphSize.width, height: morphSize.height):
+            CGRect(x: bounds.width - morphSize.width,
+                   y: bounds.height - morphSize.height,
+                   width: morphSize.width, height: morphSize.height)
+        
+        let morphAnimation = CABasicAnimation(keyPath: "path")
+        morphAnimation.duration = animationDuration
+        morphAnimation.toValue = UIBezierPath(ovalIn: morphedFrame).cgPath;
+        morphAnimation.timingFunction = CAMediaTimingFunction(
+                name: kCAMediaTimingFunctionEaseOut)
+        circleLayer.add(morphAnimation, forKey: nil);
+        maskLayer.add(morphAnimation, forKey: nil);
+    }
   
 }
