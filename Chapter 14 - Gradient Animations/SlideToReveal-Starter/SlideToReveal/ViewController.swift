@@ -40,13 +40,13 @@ class ViewController: UIViewController {
     image.center.x += view.bounds.size.width
     view.addSubview(image)
     
-    UIView.animateWithDuration(0.33, delay: 0.0, options: [], animations: {
+    UIView.animate(withDuration: 0.33, delay: 0.0, options: [], animations: {
       self.time.center.y -= 200.0
       self.slideView.center.y += 200.0
       image.center.x -= self.view.bounds.size.width
       }, completion: nil)
     
-    UIView.animateWithDuration(0.33, delay: 1.0, options: [], animations: {
+    UIView.animate(withDuration: 0.33, delay: 1.0, options: [], animations: {
       self.time.center.y += 200.0
       self.slideView.center.y -= 200.0
       image.center.x += self.view.bounds.size.width
