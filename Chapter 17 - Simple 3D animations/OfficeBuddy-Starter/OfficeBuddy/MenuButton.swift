@@ -31,7 +31,7 @@ class MenuButton: UIView {
     frame = CGRect(x: 0.0, y: 0.0, width: 20.0, height: 20.0)
     
     imageView = UIImageView(image:UIImage(named:"menu.png"))
-    imageView.userInteractionEnabled = true
+    imageView.isUserInteractionEnabled = true
     imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: Selector("didTap")))
     addSubview(imageView)
   }

@@ -28,19 +28,19 @@ class SideMenuViewController: UITableViewController {
   
   // MARK: UITableViewDataSource
   
-  override func tableView(tableView:UITableView, numberOfRowsInSection section:Int) -> Int {
+  override func tableView(_ tableView:UITableView, numberOfRowsInSection section:Int) -> Int {
     return MenuItem.sharedItems.count
   }
   
-  override func tableView(tableView:UITableView, cellForRowAtIndexPath indexPath:NSIndexPath) -> UITableViewCell {
+  override func tableView(_ tableView:UITableView, cellForRowAt indexPath:IndexPath) -> UITableViewCell {
     
-    let cell = tableView.dequeueReusableCellWithIdentifier("MenuCell", forIndexPath:indexPath) as UITableViewCell
+    let cell = tableView.dequeueReusableCell(withIdentifier: "MenuCell", for:indexPath) as UITableViewCell
     
     let menuItem = MenuItem.sharedItems[indexPath.row]
-    cell.textLabel?.backgroundColor = UIColor.clearColor()
-    cell.textLabel?.textColor = UIColor.whiteColor()
+    cell.textLabel?.backgroundColor = UIColor.clear
+    cell.textLabel?.textColor = UIColor.white
     cell.textLabel?.font = UIFont(name: "Helvetica", size: 36.0)
-    cell.textLabel?.textAlignment = .Center
+    cell.textLabel?.textAlignment = .center
     cell.textLabel?.text = menuItem.symbol
     
     cell.contentView.backgroundColor = menuItem.color
@@ -48,26 +48,26 @@ class SideMenuViewController: UITableViewController {
     return cell
   }
   
-  override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView  {
-    return tableView.dequeueReusableCellWithIdentifier("HeaderCell")!
+  override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView  {
+    return tableView.dequeueReusableCell(withIdentifier: "HeaderCell")!
   }
   
   // MARK: UITableViewDelegate
   
-  override func tableView(tableView:UITableView, didSelectRowAtIndexPath indexPath:NSIndexPath) {
-    tableView.deselectRowAtIndexPath(indexPath, animated:true)
+  override func tableView(_ tableView:UITableView, didSelectRowAt indexPath:IndexPath) {
+    tableView.deselectRow(at: indexPath, animated:true)
     
     centerViewController.menuItem = MenuItem.sharedItems[indexPath.row]
     
-    let containerVC = parentViewController as! ContainerViewController
+    let containerVC = parent as! ContainerViewController
     containerVC.toggleSideMenu()
   }
   
-  override func tableView(tableView:UITableView, heightForRowAtIndexPath indexPath:NSIndexPath) -> CGFloat {
+  override func tableView(_ tableView:UITableView, heightForRowAt indexPath:IndexPath) -> CGFloat {
     return 84.0
   }
   
-  override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+  override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
     return 64.0
   }
 }

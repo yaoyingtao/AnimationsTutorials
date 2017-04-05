@@ -43,7 +43,7 @@ class CenterViewController: UIViewController {
     
     menuButton = MenuButton()
     menuButton.tapHandler = {
-      if let containerVC = self.navigationController?.parentViewController as? ContainerViewController {
+      if let containerVC = self.navigationController?.parent as? ContainerViewController {
         containerVC.toggleSideMenu()
       }
     }

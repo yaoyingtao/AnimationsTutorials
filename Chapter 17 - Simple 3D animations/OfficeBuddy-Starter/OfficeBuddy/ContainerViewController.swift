@@ -26,7 +26,7 @@ import QuartzCore
 class ContainerViewController: UIViewController {
   
   let menuWidth: CGFloat = 80.0
-  let animationTime: NSTimeInterval = 0.5
+  let animationTime: TimeInterval = 0.5
   
   let menuViewController: UIViewController!
   let centerViewController: UIViewController!
@@ -43,48 +43,54 @@ class ContainerViewController: UIViewController {
     fatalError("init(coder:) has not been implemented")
   }
   
-  override func preferredStatusBarStyle() -> UIStatusBarStyle {
-    return .LightContent
+  override var preferredStatusBarStyle : UIStatusBarStyle {
+    return .lightContent
   }
   
   override func viewDidLoad() {
     
     super.viewDidLoad()
-    view.backgroundColor = UIColor.blackColor()
+    view.backgroundColor = UIColor.black
     setNeedsStatusBarAppearanceUpdate()
     
     addChildViewController(centerViewController)
     view.addSubview(centerViewController.view)
-    centerViewController.didMoveToParentViewController(self)
+    centerViewController.didMove(toParentViewController: self)
     
     addChildViewController(menuViewController)
     view.addSubview(menuViewController.view)
-    menuViewController.didMoveToParentViewController(self)
+    menuViewController.didMove(toParentViewController: self)
     
+    menuViewController.view.layer.anchorPoint.x = 1.0;
     menuViewController.view.frame = CGRect(x: -menuWidth, y: 0, width: menuWidth, height: view.frame.height)
     
     let panGesture = UIPanGestureRecognizer(target:self, action:Selector("handleGesture:"))
     view.addGestureRecognizer(panGesture)
+    
+    setToPercent(0.0)
   }
   
-  func handleGesture(recognizer: UIPanGestureRecognizer) {
+  func handleGesture(_ recognizer: UIPanGestureRecognizer) {
     
-    let translation = recognizer.translationInView(recognizer.view!.superview!)
+    let translation = recognizer.translation(in: recognizer.view!.superview!)
     
     var progress = translation.x / menuWidth * (isOpening ? 1.0 : -1.0)
     progress = min(max(progress, 0.0), 1.0)
     
     switch recognizer.state {
-    case .Began:
+    case .began:
       let isOpen = floor(centerViewController.view.frame.origin.x/menuWidth)
       isOpening = isOpen == 1.0 ? false: true
+        
+      menuViewController.view.layer.shouldRasterize = true
+      menuViewController.view.layer.rasterizationScale = UIScreen.main.scale
       
-    case .Changed:
+    case .changed:
       self.setToPercent(isOpening ? progress: (1.0 - progress))
-      
-    case .Ended: fallthrough
-    case .Cancelled: fallthrough
-    case .Failed:
+      self.menuViewController.view.layer.shouldRasterize = false
+    case .ended: fallthrough
+    case .cancelled: fallthrough
+    case .failed:
       
       var targetProgress: CGFloat
       if (isOpening) {
@@ -93,7 +99,7 @@ class ContainerViewController: UIViewController {
         targetProgress = progress < 0.5 ? 1.0 : 0.0
       }
       
-      UIView.animateWithDuration(animationTime, animations: {
+      UIView.animate(withDuration: animationTime, animations: {
         self.setToPercent(targetProgress)
         }, completion: {_ in
           
@@ -107,16 +113,30 @@ class ContainerViewController: UIViewController {
     let isOpen = floor(centerViewController.view.frame.origin.x/menuWidth)
     let targetProgress: CGFloat = isOpen == 1.0 ? 0.0: 1.0
     
-    UIView.animateWithDuration(animationTime, animations: {
+    UIView.animate(withDuration: animationTime, animations: {
       self.setToPercent(targetProgress)
       }, completion: { _ in
         self.menuViewController.view.layer.shouldRasterize = false
     })
   }
   
-  func setToPercent(percent: CGFloat) {
+  func setToPercent(_ percent: CGFloat) {
     centerViewController.view.frame.origin.x = menuWidth * CGFloat(percent)
-    menuViewController.view.frame.origin.x = menuWidth * CGFloat(percent) - menuWidth
+//    menuViewController.view.frame.origin.x = menuWidth * CGFloat(percent) - menuWidth
+    menuViewController.view.layer.transform = menuTransformForPercent(percent);
+    menuViewController.view.alpha = CGFloat(max(0.2, percent))
+    
   }
+    
+    func menuTransformForPercent(_ percent: CGFloat) -> CATransform3D{
+        var identy = CATransform3DIdentity;
+        identy.m34 = -1.0/1000;
+        let remaindPercent = 1 - percent;
+        let angle = remaindPercent * CGFloat(-M_PI_2);
+        let rotateTranform = CATransform3DRotate(identy, angle, 0.0, 1.0, 0.0);
+        let translateTranfoem = CATransform3DTranslate(identy, menuWidth*percent, 0, 0);
+        return CATransform3DConcat(rotateTranform, translateTranfoem);
+        
+    }
   
 }
