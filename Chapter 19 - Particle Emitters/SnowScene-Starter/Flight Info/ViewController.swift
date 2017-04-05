@@ -72,7 +72,7 @@ class ViewController: UIViewController {
     
     let emmitCell = CAEmitterCell();
     emmitCell.contents = UIImage(named: "flake.png")?.cgImage;
-    emmitCell.birthRate = 150;
+    emmitCell.birthRate = 50;
     emmitCell.lifetime = 3.5;
     emmitCell.yAcceleration = 70;
     emmitCell.xAcceleration = 10;
@@ -90,7 +90,48 @@ class ViewController: UIViewController {
     emmitCell.alphaRange = 0.75;
     emmitCell.alphaSpeed = -0.15;
     
-    emmiter.emitterCells = [emmitCell];
+    
+    let firstCell = CAEmitterCell();
+    firstCell.contents = UIImage(named: "flake3.png")?.cgImage;
+    firstCell.birthRate = 50;
+    firstCell.lifetime = 3.5;
+    firstCell.yAcceleration = 70;
+    firstCell.xAcceleration = 10;
+    firstCell.velocity = 20;
+    firstCell.emissionLongitude = CGFloat(-M_PI);
+    firstCell.velocityRange = 200.0;
+    firstCell.emissionRange = CGFloat(M_PI_2);
+    firstCell.color = UIColor(red: 0.9, green: 1.0, blue: 1.0, alpha: 1.0).cgColor;
+    firstCell.redRange = 0.1;
+    firstCell.greenRange = 0.1;
+    firstCell.blueRange = 0.1;
+    firstCell.scale = 0.8;
+    firstCell.scaleRange = 0.8;
+    firstCell.scaleSpeed = -0.15;
+    firstCell.alphaRange = 0.75;
+    firstCell.alphaSpeed = -0.15;
+    
+    let secCell = CAEmitterCell();
+    secCell.contents = UIImage(named: "flake4.png")?.cgImage;
+    secCell.birthRate = 50;
+    secCell.lifetime = 3.5;
+    secCell.yAcceleration = 70;
+    secCell.xAcceleration = 10;
+    secCell.velocity = 20;
+    secCell.emissionLongitude = CGFloat(-M_PI);
+    secCell.velocityRange = 200.0;
+    secCell.emissionRange = CGFloat(M_PI_2);
+    secCell.color = UIColor(red: 0.9, green: 1.0, blue: 1.0, alpha: 1.0).cgColor;
+    secCell.redRange = 0.1;
+    secCell.greenRange = 0.1;
+    secCell.blueRange = 0.1;
+    secCell.scale = 0.8;
+    secCell.scaleRange = 0.8;
+    secCell.scaleSpeed = -0.15;
+    secCell.alphaRange = 0.75;
+    secCell.alphaSpeed = -0.15;
+    
+    emmiter.emitterCells = [emmitCell, firstCell, secCell];
     
     
   }
