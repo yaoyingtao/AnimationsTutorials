@@ -27,7 +27,13 @@ class ViewController: UIViewController {
   @IBOutlet var penguin: UIImageView!
   @IBOutlet var slideButton: UIButton!
   
-  var isLookingRight: Bool = true
+    var isLookingRight: Bool = true {
+        didSet{
+            let xScale: CGFloat = isLookingRight ? 1 : -1;
+            penguin.transform = CGAffineTransform(scaleX: xScale, y: 1);
+            slideButton.transform = penguin.transform;
+        }
+    }
   var penguinY: CGFloat!
   
   var walkSize: CGSize!
@@ -59,25 +65,50 @@ class ViewController: UIViewController {
     //setup the animation
     penguinY = penguin.frame.origin.y
     
+    loadWalkAnimation()
+    
   }
   
   func loadWalkAnimation() {
-    
+    penguin.animationImages = walkFrames;
+    penguin.animationDuration = animationDuration/3;
+    penguin.animationRepeatCount = 3;
   }
   
   func loadSlideAnimation() {
-    
+    penguin.animationImages = slideFrames
+    penguin.animationDuration = animationDuration
+    penguin.animationRepeatCount = 1
   }
   
-  @IBAction func actionLeft(sender: AnyObject) {
-    
+  @IBAction func actionLeft(_ sender: AnyObject) {
+    loadSlideAnimation();
+
+    isLookingRight = false;
+    penguin.startAnimating();
+    UIView.animate(withDuration: animationDuration, animations: { 
+        self.penguin.center.x -= self.walkSize.width;
+    });
+    }
+  
+  @IBAction func actionRight(_ sender: AnyObject) {
+    loadSlideAnimation();
+
+    isLookingRight = true;
+    penguin.startAnimating();
+    UIView.animate(withDuration: animationDuration, animations: {
+        self.penguin.center.x += self.walkSize.width;
+    });
+
   }
   
-  @IBAction func actionRight(sender: AnyObject) {
-    
-  }
-  
-  @IBAction func actionSlide(sender: AnyObject) {
+  @IBAction func actionSlide(_ sender: AnyObject) {
+    loadSlideAnimation();
+    penguin.startAnimating();
+    penguin.contentMode = .center;
+    UIView.animate(withDuration: animationDuration, animations: {
+        self.penguin.center.x += self.isLookingRight ? self.walkSize.width : -self.walkSize.width;
+    });
     
   }
 }
