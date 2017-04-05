@@ -26,10 +26,10 @@ import QuartzCore
 //
 // Util delay function
 //
-func delay(seconds seconds: Double, completion:()->()) {
-  let popTime = dispatch_time(DISPATCH_TIME_NOW, Int64( Double(NSEC_PER_SEC) * seconds ))
+func delay(seconds: Double, completion:@escaping ()->()) {
+  let popTime = DispatchTime.now() + Double(Int64( Double(NSEC_PER_SEC) * seconds )) / Double(NSEC_PER_SEC)
   
-  dispatch_after(popTime, dispatch_get_main_queue()) {
+  DispatchQueue.main.asyncAfter(deadline: popTime) {
     completion()
   }
 }
@@ -62,12 +62,42 @@ class ViewController: UIViewController {
     //start rotating the flights
     changeFlightDataTo(londonToParis)
     
+    let rect = CGRect(x: 0.0, y: -70, width: view.bounds.width, height: 50);
+    let emmiter = CAEmitterLayer();
+    emmiter.frame = rect;
+    view.layer.addSublayer(emmiter);
+    emmiter.emitterShape = kCAEmitterLayerRectangle;
+    emmiter.emitterPosition = CGPoint(x: rect.width/2, y: rect.height/2);
+    emmiter.emitterSize = rect.size;
+    
+    let emmitCell = CAEmitterCell();
+    emmitCell.contents = UIImage(named: "flake.png")?.cgImage;
+    emmitCell.birthRate = 150;
+    emmitCell.lifetime = 3.5;
+    emmitCell.yAcceleration = 70;
+    emmitCell.xAcceleration = 10;
+    emmitCell.velocity = 20;
+    emmitCell.emissionLongitude = CGFloat(-M_PI);
+    emmitCell.velocityRange = 200.0;
+    emmitCell.emissionRange = CGFloat(M_PI_2);
+    emmitCell.color = UIColor(red: 0.9, green: 1.0, blue: 1.0, alpha: 1.0).cgColor;
+    emmitCell.redRange = 0.1;
+    emmitCell.greenRange = 0.1;
+    emmitCell.blueRange = 0.1;
+    emmitCell.scale = 0.8;
+    emmitCell.scaleRange = 0.8;
+    emmitCell.scaleSpeed = -0.15;
+    emmitCell.alphaRange = 0.75;
+    emmitCell.alphaSpeed = -0.15;
+    
+    emmiter.emitterCells = [emmitCell];
+    
     
   }
   
   //MARK: custom methods
   
-  func changeFlightDataTo(data: FlightData) {
+  func changeFlightDataTo(_ data: FlightData) {
     
     // populate the UI with the next flight's data
     summary.text = data.summary
