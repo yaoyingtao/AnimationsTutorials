@@ -31,23 +31,23 @@ class ImageViewCard: UIImageView {
     self.init()
     
     image = UIImage(named: imageNamed)
-    contentMode = .ScaleAspectFill
+    contentMode = .scaleAspectFill
     clipsToBounds = true
     
     title = name
     
-    autoresizingMask = [.FlexibleHeight, .FlexibleWidth]
+    autoresizingMask = [.flexibleHeight, .flexibleWidth]
     
     layer.shouldRasterize = true
-    layer.rasterizationScale = UIScreen.mainScreen().scale
+    layer.rasterizationScale = UIScreen.main.scale
   }
   
   override func didMoveToSuperview() {
-    userInteractionEnabled = true
+    isUserInteractionEnabled = true
     addGestureRecognizer(UITapGestureRecognizer(target: self, action: Selector("didTapHandler:")))
   }
   
-  func didTapHandler(tap: UITapGestureRecognizer) {
+  func didTapHandler(_ tap: UITapGestureRecognizer) {
     didSelect?(self)
   }
 }
