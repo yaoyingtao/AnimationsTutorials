@@ -31,6 +31,8 @@ class ViewController: UIViewController {
     ImageViewCard(imageNamed: "Hurricane_Norbert.jpg", title: "Hurricane Norbert"),
     ImageViewCard(imageNamed: "Hurricane_Irene.jpg", title: "Hurricane Irene")
   ]
+    
+    var isGalleryOpen = false;
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -63,6 +65,23 @@ class ViewController: UIViewController {
   }
   
   @IBAction func toggleGallery(_ sender: AnyObject) {
+    if isGalleryOpen {
+        for subview in view.subviews {
+            if let image = subview as? ImageViewCard {
+                let animation = CABasicAnimation(keyPath: "transform");
+                animation.fromValue = NSValue(caTransform3D: image.layer.transform)
+                animation.toValue = NSValue(caTransform3D: CATransform3DIdentity)
+                animation.duration = 0.33
+                image.layer.add(animation, forKey: nil)
+                image.layer.transform = CATransform3DIdentity;
+            }
+        }
+        isGalleryOpen = false;
+        return;
+    }
+    
+    
+    
     var imageYOffset: CGFloat = 50.0;
     for subview in view.subviews {
         if let image = subview as? ImageViewCard {
@@ -85,6 +104,8 @@ class ViewController: UIViewController {
         }
     }
     
+    isGalleryOpen = true;
+    
   }
     
     func selectImage(selectedImage: ImageViewCard) {
@@ -106,6 +127,7 @@ class ViewController: UIViewController {
                     })
                 } }
         }
+        isGalleryOpen = false;
     }
   
 }
