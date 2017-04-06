@@ -26,6 +26,8 @@ import QuartzCore
 class DetailViewController: UITableViewController, UINavigationControllerDelegate {
   
   let maskLayer: CAShapeLayer = RWLogoLayer.logoLayer()
+    weak var animator: RevealAnimator?
+
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -41,7 +43,27 @@ class DetailViewController: UITableViewController, UINavigationControllerDelegat
     super.viewDidAppear(animated)
     
     view.layer.mask = nil
+    
+    if let masterVC = navigationController!.viewControllers.first as? MasterViewController {
+        animator = masterVC.transition
+    }
+    
+    let pan = UIPanGestureRecognizer(target: self, action: #selector(MasterViewController.didPan(_:)))
+    view.addGestureRecognizer(pan)
   }
+    
+    func didPan(_ recognizer: UIPanGestureRecognizer) {
+        
+        if let animator = animator {
+            
+            if recognizer.state == .began {
+                animator.interactive = true
+                navigationController!.popViewController(animated: true)
+            }
+            
+            animator.handlePan(recognizer: recognizer)
+        }
+    }
   
   // MARK: Table View methods
   let packItems = ["Icecream money", "Great weather", "Beach ball", "Swim suit for him", "Swim suit for her", "Beach games", "Ironing board", "Cocktail mood", "Sunglasses", "Flip flops"]
