@@ -19,9 +19,8 @@ class RevealAnimator: NSObject,UIViewControllerAnimatedTransitioning,CAAnimation
     
 
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        if operation != .push {
-            return;
-        }
+        if operation == .push {
+        
         storedContext = transitionContext;
         
         let fromVC = transitionContext.viewController( forKey: UITransitionContextViewControllerKey.from) as! MasterViewController;
@@ -40,6 +39,25 @@ class RevealAnimator: NSObject,UIViewControllerAnimatedTransitioning,CAAnimation
         
         toVC.maskLayer.add(animation, forKey: nil);
         fromVC.logo.add(animation, forKey: nil);
+        
+        let fadeIn = CABasicAnimation(keyPath: "opacity")
+        fadeIn.fromValue = 0.0;
+        fadeIn.toValue = 1.0;
+        fadeIn.duration = animationDuration;
+        toVC.view.layer.add(fadeIn, forKey: nil);
+        } else {
+            let fromVC = transitionContext.viewController( forKey: UITransitionContextViewControllerKey.from) as! DetailViewController;
+            let toVC = transitionContext.viewController(forKey:UITransitionContextViewControllerKey.to) as! MasterViewController
+            
+            transitionContext.containerView.insertSubview(toVC.view, belowSubview: fromVC.view);
+            
+            UIView.animate(withDuration: animationDuration, animations: { 
+                fromVC.view.transform = CGAffineTransform(scaleX: 0.01, y: 0.01);
+            }, completion: { _ in
+                transitionContext.completeTransition(true);
+            })
+            
+        }
         
     }
     
