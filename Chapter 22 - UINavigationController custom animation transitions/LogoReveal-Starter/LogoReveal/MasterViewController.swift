@@ -26,10 +26,10 @@ import QuartzCore
 //
 // Util delay function
 //
-func delay(seconds seconds: Double, completion:()->()) {
-  let popTime = dispatch_time(DISPATCH_TIME_NOW, Int64( Double(NSEC_PER_SEC) * seconds ))
+func delay(seconds: Double, completion:@escaping ()->()) {
+  let popTime = DispatchTime.now() + Double(Int64( Double(NSEC_PER_SEC) * seconds )) / Double(NSEC_PER_SEC)
   
-  dispatch_after(popTime, dispatch_get_main_queue()) {
+  DispatchQueue.main.asyncAfter(deadline: popTime) {
     completion()
   }
 }
@@ -37,14 +37,16 @@ func delay(seconds seconds: Double, completion:()->()) {
 class MasterViewController: UIViewController {
   
   let logo = RWLogoLayer.logoLayer()
+    let transition = RevealAnimator()
   
   override func viewDidLoad() {
     super.viewDidLoad()
     title = "Start"
+    navigationController?.delegate = self;
     
   }
   
-  override func viewDidAppear(animated: Bool) {
+  override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
     // add the tap gesture recognizer
@@ -54,7 +56,7 @@ class MasterViewController: UIViewController {
     // add the logo to the view
     logo.position = CGPoint(x: view.layer.bounds.size.width/2,
       y: view.layer.bounds.size.height/2 + 30)
-    logo.fillColor = UIColor.whiteColor().CGColor
+    logo.fillColor = UIColor.white.cgColor
     view.layer.addSublayer(logo)
   }
   
@@ -62,7 +64,14 @@ class MasterViewController: UIViewController {
   // MARK: Gesture recognizer handler
   //
   func didTap() {
-    performSegueWithIdentifier("details", sender: nil)
+    performSegue(withIdentifier: "details", sender: nil)
   }
   
+}
+
+extension MasterViewController:UINavigationControllerDelegate {
+    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationControllerOperation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        transition.operation = operation;
+        return transition;
+    }
 }
