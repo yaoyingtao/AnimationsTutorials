@@ -48,9 +48,19 @@ class PopAnimator: NSObject,UIViewControllerAnimatedTransitioning {
         containerView.bringSubview(toFront: herbView!);
         
         
+        let herbController = transitionContext.viewController(
+            forKey: presenting ? UITransitionContextViewControllerKey.to : UITransitionContextViewControllerKey.from
+            ) as? HerbDetailsViewController
+        
+        if presenting {
+            herbController?.containerView.alpha = 0.0
+        }
+        
         UIView.animate(withDuration: duration, delay: 0.0, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.0, options: [], animations: { 
             herbView?.transform = self.presenting ? CGAffineTransform.identity : scaleTransform;
             herbView?.center = CGPoint(x: finalFrame.midX, y: finalFrame.midY);
+            herbController?.containerView.alpha = self.presenting ? 1.0 : 0.0
+
         }) { _ in
             if !self.presenting {
                 self.dismissCompletion?()
@@ -58,6 +68,16 @@ class PopAnimator: NSObject,UIViewControllerAnimatedTransitioning {
             transitionContext.completeTransition(true);
 
         }
+        
+        let round = CABasicAnimation(keyPath: "cornerRadius")
+        round.fromValue = !presenting ? 0.0 : 20.0/xScaleFactor
+        round.toValue = presenting ? 0.0 : 20.0/xScaleFactor
+        round.duration = duration / 2
+        herbView?.layer.add(round, forKey: nil)
+        herbView?.layer.cornerRadius = presenting ? 0.0 : 20.0/xScaleFactor
+        
+
+        
 //        UIView.animate(withDuration: duration, animations: {
 //            toView?.alpha = 1.0
 //        }) { _ in
