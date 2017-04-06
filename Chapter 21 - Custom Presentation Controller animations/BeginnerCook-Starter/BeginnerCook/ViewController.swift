@@ -29,15 +29,19 @@ class ViewController: UIViewController {
   @IBOutlet var listView: UIScrollView!
   @IBOutlet var bgImage: UIImageView!
   var selectedImage: UIImageView?
+    
+    let transition = PopAnimator();
   
   //MARK: UIViewController
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    
+    transition.dismissCompletion = {
+        self.selectedImage!.isHidden = false
+    }
   }
   
-  override func viewWillAppear(animated: Bool) {
+  override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
     if listView.subviews.count < herbs.count {
@@ -46,8 +50,8 @@ class ViewController: UIViewController {
     }
   }
   
-  override func preferredStatusBarStyle() -> UIStatusBarStyle {
-    return .LightContent
+  override var preferredStatusBarStyle : UIStatusBarStyle {
+    return .lightContent
   }
   
   //MARK: View setup
@@ -55,13 +59,13 @@ class ViewController: UIViewController {
   //add all images to the list
   func setupList() {
     
-    for var i=0; i < herbs.count; i++ {
+    for i in 0 ..< herbs.count {
       
       //create image view
       let imageView  = UIImageView(image: UIImage(named: herbs[i].image))
       imageView.tag = i
-      imageView.contentMode = .ScaleAspectFill
-      imageView.userInteractionEnabled = true
+      imageView.contentMode = .scaleAspectFill
+      imageView.isUserInteractionEnabled = true
       imageView.layer.cornerRadius = 20.0
       imageView.layer.masksToBounds = true
       listView.addSubview(imageView)
@@ -70,7 +74,7 @@ class ViewController: UIViewController {
       imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: Selector("didTapImageView:")))
     }
     
-    listView.backgroundColor = UIColor.clearColor()
+    listView.backgroundColor = UIColor.clear
     positionListItems()
   }
   
@@ -78,12 +82,12 @@ class ViewController: UIViewController {
   func positionListItems() {
     
     let itemHeight: CGFloat = listView.frame.height * 1.33
-    let aspectRatio = UIScreen.mainScreen().bounds.height / UIScreen.mainScreen().bounds.width
+    let aspectRatio = UIScreen.main.bounds.height / UIScreen.main.bounds.width
     let itemWidth: CGFloat = itemHeight / aspectRatio
     
     let horizontalPadding: CGFloat = 10.0
     
-    for var i=0; i < herbs.count; i++ {
+    for i in 0 ..< herbs.count {
       let imageView = listView.viewWithTag(i) as! UIImageView
       imageView.frame = CGRect(
         x: CGFloat(i) * itemWidth + CGFloat(i+1) * horizontalPadding, y: 0.0,
@@ -97,15 +101,41 @@ class ViewController: UIViewController {
   
   //MARK: Actions
   
-  func didTapImageView(tap: UITapGestureRecognizer) {
+  func didTapImageView(_ tap: UITapGestureRecognizer) {
     selectedImage = tap.view as? UIImageView
     
     let index = tap.view!.tag
     let selectedHerb = herbs[index]
     
     //present details view controller
-    let herbDetails = storyboard!.instantiateViewControllerWithIdentifier("HerbDetailsViewController") as! HerbDetailsViewController
+    let herbDetails = storyboard!.instantiateViewController(withIdentifier: "HerbDetailsViewController") as! HerbDetailsViewController
     herbDetails.herb = selectedHerb
-    presentViewController(herbDetails, animated: true, completion: nil)
+    herbDetails.transitioningDelegate = self;
+    present(herbDetails, animated: true, completion: nil)
   }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator);
+        
+        coordinator.animate(alongsideTransition: { (contex) in
+            self.bgImage.alpha = (size.width>size.height) ? 0.25 : 0.55;
+            self.positionListItems();
+        }, completion: nil);
+    }
+}
+
+extension ViewController:UIViewControllerTransitioningDelegate {
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        transition.originFrame = selectedImage!.superview!.convert(selectedImage!.frame,
+                                                                   to: nil)
+        transition.presenting = true
+        return transition;
+    }
+    
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        transition.presenting = true
+
+        return transition;
+    }
 }

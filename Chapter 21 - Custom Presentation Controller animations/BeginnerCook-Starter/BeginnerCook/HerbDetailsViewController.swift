@@ -34,7 +34,7 @@ class HerbDetailsViewController: UIViewController, UIViewControllerTransitioning
   
   var herb: HerbModel!
   
-  override func viewWillAppear(animated: Bool) {
+  override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
     bgImage.image = UIImage(named: herb.image)
@@ -44,22 +44,22 @@ class HerbDetailsViewController: UIViewController, UIViewControllerTransitioning
     view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: Selector("actionClose:")))
   }
   
-  func actionClose(tap: UITapGestureRecognizer) {
-    presentingViewController?.dismissViewControllerAnimated(true, completion: nil)
+  func actionClose(_ tap: UITapGestureRecognizer) {
+    presentingViewController?.dismiss(animated: true, completion: nil)
   }
   
-  override func preferredStatusBarStyle() -> UIStatusBarStyle {
-    return .LightContent
+  override var preferredStatusBarStyle : UIStatusBarStyle {
+    return .lightContent
   }
   
   //MARK: button actions
   
-  @IBAction func actionLicense(sender: AnyObject) {
-    UIApplication.sharedApplication().openURL(NSURL(string: herb!.license)!)
+  @IBAction func actionLicense(_ sender: AnyObject) {
+    UIApplication.shared.openURL(URL(string: herb!.license)!)
   }
   
-  @IBAction func actionAuthor(sender: AnyObject) {
-    UIApplication.sharedApplication().openURL(NSURL(string: herb!.credit)!)
+  @IBAction func actionAuthor(_ sender: AnyObject) {
+    UIApplication.shared.openURL(URL(string: herb!.credit)!)
   }
   
   
